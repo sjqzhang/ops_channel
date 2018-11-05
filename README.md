@@ -40,11 +40,11 @@ wget  http://{serverip}:9160/cli/upgrade -O /bin/cli && chmod +x /bin/cli && cli
 
 ### 登陆相关
 ```
-cli login -u username -p password
-cli logout
-cli register -u username -p password
-cli enableuser -u username
-cli disableuser -u username
+cli login -u username -p password #用户名密码登陆
+cli logout #登出
+cli register -u username -p password #注册用户 
+cli enableuser -u username #启用用户
+cli disableuser -u username #禁用用户
 ```
 
 ### shell相关
@@ -82,15 +82,17 @@ cli repair -i ip(客户端ip)
 ```
 cli upload -f filename ##文件上传(需登陆)
 cli delfile -f filename ##文件上传(需登陆)
-cli listfile -d directory
+cli listfile -d directory ##查看文件
 ```
 
 
 
 ### 执行命令
 ```
-cli rshell -u username --sudo 0 --token token -i ip -d directory -f filename -a arguments -o json --async 1　-t timeout
-cli api -u username --sudo 0 --token token -c command -i ip -o json --async 1 -t timeout
+cli register -u username -p password  #注册用户
+cli addtoken -t token -u user -s sudo -b blackip -w whiteip  #增加token认证
+cli rshell -u username --sudo 0 --token token -i ip -d directory -f filename -a arguments -o json --async 1　-t timeout #远程执行
+cli api -u username --sudo 0 --token token -c command -i ip -o json --async 1 -t timeout #执行命令
 参数说明：
 -i ip(在那个ip上运行指令，多个ip用英文逗号分隔)
 -u username(执行的用户)
