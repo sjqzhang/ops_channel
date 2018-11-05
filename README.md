@@ -55,7 +55,7 @@ echo HELLO | cli lower  ##字符串转小写
 echo 'hello,world' |cli split -s ',' ##字符串分隔
 echo 'hello,world' |cli split -s ','|cli join -s ' '　##数组并接  
 echo 'hello,world' |cli split -s ','|cli jq -k 0 |cli join 　##数组并接 
-echo 'hello,world' |cli match -m '[\w+]+$'　##字符正则匹配
+echo 'hello,world' |cli match -m '[\w+]+$' -o aim　##字符正则匹配 -o aim (i:ignoresencase,a:all,m:mutiline) 
 echo 'hello,world' |cli cut -p 5:-1  ##字符串截取
 echo '{"name":"hello","date":"2018-11-09"}'|cli jq -k name  ##json解析器
 cli md5 -s 'hello'　##字符md5
