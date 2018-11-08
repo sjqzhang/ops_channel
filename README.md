@@ -1,7 +1,7 @@
 # 请给点耐心往下看....你要的在后面,一条命令就OK.
 
 ## 什么是运维通道？
-运维通道是联接运维人员与机器的一座桥.它跟常用的开源运维工具(`ansible`,`saltstack`,`puppet`)没有本质区别.
+运维通道是联接运维人员与机器的一座桥.它跟常用的开源运维工具(`ansible`,`saltstack`,`puppet`)没有本质区别,那为什么还要重复造轮子呢?
 ## 运维通道有那些特点？
 运维通道简单，高效，安全，可靠，可扩展．
 - 简单：只有一个可执行文件，无需第三方依赖，安装(服务端，客户端)只需一条命令．客户端零配置．
@@ -19,7 +19,7 @@
 ## 硬件要求？
 ```
 客户端千级别以下，4核8g
-客户端万级别以下，８核16g
+客户端万级别以下，8核16g
 ```
 
 
@@ -34,6 +34,12 @@ wget --no-check-certificate https://github.com/sjqzhang/ops_channel/releases/dow
 ### 安装客户端
 ```
 wget  http://{serverip}:9160/cli/upgrade -O /bin/cli && chmod +x /bin/cli && cli daemon -s restart
+```
+
+
+### 简单使用(`服务端执行`)
+```
+cli api --token abc -u root --sudo 1 -c hostname -i ip{客户端ip}
 ```
 
 ## cli客户端命令
