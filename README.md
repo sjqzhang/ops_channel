@@ -36,6 +36,12 @@ wget --no-check-certificate https://github.com/sjqzhang/ops_channel/releases/dow
 wget  http://{serverip}:9160/cli/upgrade -O /bin/cli && chmod +x /bin/cli && cli daemon -s restart
 ```
 
+### 单独安装cli命令行(无服务端)
+```
+wget  https://raw.githubusercontent.com/sjqzhang/ops_channel/master/cli -O /bin/cli && chmod +x /bin/cli 
+```
+
+
 
 ### 简单使用(`服务端执行`)
 ```
