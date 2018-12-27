@@ -154,7 +154,7 @@ import random
 def cmd(ip,filename,args):
     param={
         'd':'apollo', #command
-        'f':filename, #ip
+        'f':filename, #filename (注意：这个文件先要登陆上传后才能使用）
         'a':args,# user
         'u':'root',# user
         'o':'json',# return json or text
