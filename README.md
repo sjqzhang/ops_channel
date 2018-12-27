@@ -117,8 +117,56 @@ cli api -u username --sudo 0 --token token -c command -i ip -o json --async 1 -t
 
 
 
+### http api
+```python
+###远程执行命令
+# -*- coding: utf-8 -*-
+import requests
+import json
+import time
+import threading
+import random
+def cmd(ip,cmd):
+    param={
+        'c':cmd, #command
+        'i':ip, #ip
+        'u':'root',# user
+        'o':'json',# return json or text
+        'sudo':'1', # sudo
+    }
+    headers={'token':'abc'}
+    data={'param':json.dumps(param)}
+    return requests.post('http://server ip:9160/cli/api',data=data,headers=headers).text
+
+print cmd('client ip','hostname')
 
 
+
+
+###远程执行脚本
+
+# -*- coding: utf-8 -*-
+import requests
+import json
+import time
+import threading
+import random
+def cmd(ip,filename,args):
+    param={
+        'd':'apollo', #command
+        'f':filename, #ip
+        'a':args,# user
+        'u':'root',# user
+        'o':'json',# return json or text
+        'sudo':'1', # sudo
+    }
+    headers={'token':'abc'}
+    data={'param':json.dumps(param)}
+    return requests.post('http://server ip:9160/cli/rshell',data=data,headers=headers).text
+
+print cmd('client ip','test.sh','{"name":"test"}')
+
+```
 
 
 
