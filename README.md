@@ -30,6 +30,11 @@ mkdir -p /opt/channel
 wget --no-check-certificate https://github.com/sjqzhang/ops_channel/releases/download/v1.0/CliServer  -O /opt/channel/CliServer && cd /opt/channel/ && chmod +x CliServer && ./CliServer &
 ```
 
+### Docker部署服务端)
+```
+ docker run --net=host sjqzhang/ops_channel
+```
+
 ### 安装客户端
 ```
 wget  http://{serverip}:9160/cli/upgrade -O /bin/cli && chmod +x /bin/cli && cli daemon -s restart
@@ -46,6 +51,9 @@ wget  https://raw.githubusercontent.com/sjqzhang/ops_channel/master/cli -O /bin/
 ```
 cli api --token abc -u root --sudo 1 -c hostname -i ip{客户端ip}
 ```
+
+
+
 
 ## cli客户端命令
 
