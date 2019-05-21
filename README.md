@@ -32,7 +32,10 @@ wget --no-check-certificate https://github.com/sjqzhang/ops_channel/releases/dow
 
 ### Docker部署服务端)
 ```
- docker run --net=host sjqzhang/ops_channel
+DIR=/mnt && mkdir -p $DIR/{cache,conf,doc,files,log} &&  docker run -d  --net=host --name channel -v $DIR/files:/opt/channel/files -v $DIR/conf:/opt/channel/conf  -v  $DIR/cache:/opt/channel/cache  -v  $DIR/doc:/opt/channel/doc   -v  $DIR/log:/opt/channel/log  sjqzhang/ops_channel
+```
+```
+注意:DIR=/mnt 其中/mnt为宿主机的路径,将宿主机的目录挂载到容器
 ```
 
 ### 安装客户端
