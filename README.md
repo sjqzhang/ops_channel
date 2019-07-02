@@ -30,7 +30,7 @@ mkdir -p /opt/channel
 wget --no-check-certificate https://github.com/sjqzhang/ops_channel/releases/download/v1.0/CliServer  -O /opt/channel/CliServer && cd /opt/channel/ && chmod +x CliServer && ./CliServer &
 ```
 
-### Docker部署服务端)
+### Docker部署服务端(建议）
 ```
 DIR=/mnt && mkdir -p $DIR/{cache,conf,doc,files,log} &&  docker run -d  --net=host --name channel -v $DIR/files:/opt/channel/files -v $DIR/conf:/opt/channel/conf  -v  $DIR/cache:/opt/channel/cache  -v  $DIR/doc:/opt/channel/doc   -v  $DIR/log:/opt/channel/log  sjqzhang/ops_channel
 ```
