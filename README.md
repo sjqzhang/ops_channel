@@ -1,4 +1,4 @@
-
+[![一睹为快](https://asciinema.org/a/258501.svg)](https://asciinema.org/a/258501)
 
 ## 什么是运维通道？
 运维通道是联接运维人员与机器的一座桥.它跟常用的开源运维工具(`ansible`,`saltstack`,`puppet`)没有本质区别,那为什么还要重复造轮子呢?
