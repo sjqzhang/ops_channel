@@ -1,3 +1,4 @@
+[视频教程](https://www.bilibili.com/video/av82624198?p=6)
 [![一睹为快](https://asciinema.org/a/258501.svg)](https://asciinema.org/a/258501)
 
 ## 什么是运维通道？
@@ -190,7 +191,7 @@ print cmd('client ip','test.sh','{"name":"test"}')
 ```
 可以单独使用,可以当shell的一个命令来使用,通过组合功能非常强大！
 ```
-
+[视频教程](https://www.bilibili.com/video/av82624198?p=6)
 
 
 
