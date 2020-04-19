@@ -54,7 +54,7 @@ wget  https://raw.githubusercontent.com/sjqzhang/ops_channel/master/cli -O /bin/
 
 ### 简单使用(`服务端执行`)
 ```
-cli api --token abc -u root --sudo 1 -c hostname -i ip{客户端ip}
+cli cmd --token abc -u root --sudo 1 -c hostname -i ip{客户端ip}
 ```
 
 
@@ -116,7 +116,7 @@ cli listfile -d directory ##查看文件
 cli register -u username -p password  #注册用户
 cli addtoken -t token -u user -s sudo -b blackip -w whiteip  #增加token认证
 cli rshell -u username --sudo 0 --token token -i ip -d directory -f filename -a arguments -o json --async 1　-t timeout #远程执行
-cli api -u username --sudo 0 --token token -c command -i ip -o json --async 1 -t timeout #执行命令
+cli cmd -u username --sudo 0 --token token -c command -i ip -o json --async 1 -t timeout #执行命令
 参数说明：
 -i ip(在那个ip上运行指令，多个ip用英文逗号分隔)
 -u username(执行的用户)
