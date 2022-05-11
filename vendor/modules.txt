@@ -1,56 +1,41 @@
 # github.com/PuerkitoBio/goquery v1.7.1
-## explicit
 github.com/PuerkitoBio/goquery
 # github.com/StackExchange/wmi v1.2.1
-## explicit
 github.com/StackExchange/wmi
 # github.com/andybalholm/cascadia v1.2.0
 github.com/andybalholm/cascadia
 # github.com/astaxie/beego v1.12.3
-## explicit
 github.com/astaxie/beego/httplib
 # github.com/cihub/seelog v0.0.0-20170130134532-f561c5e57575
-## explicit
 github.com/cihub/seelog
 github.com/cihub/seelog/archive
 github.com/cihub/seelog/archive/gzip
 github.com/cihub/seelog/archive/tar
 github.com/cihub/seelog/archive/zip
 # github.com/deckarep/golang-set v1.7.1
-## explicit
 github.com/deckarep/golang-set
 # github.com/go-ole/go-ole v1.2.5
 github.com/go-ole/go-ole
 github.com/go-ole/go-ole/oleutil
+# github.com/go-sql-driver/mysql v1.5.0
+github.com/go-sql-driver/mysql
 # github.com/go-xorm/xorm v0.7.9
-## explicit
 github.com/go-xorm/xorm
 # github.com/goftp/file-driver v0.0.0-20180502053751-5d604a0fc0c9
-## explicit
 github.com/goftp/file-driver
 # github.com/goftp/server v0.0.0-20200708154336-f64f7c2d8a42
-## explicit
 github.com/goftp/server
 # github.com/golang/snappy v0.0.0-20180518054509-2e65f85255db
 github.com/golang/snappy
 # github.com/henrylee2cn/mahonia v0.0.0-20150715080413-be6deb105fbc
-## explicit
 github.com/henrylee2cn/mahonia
 # github.com/howeyc/gopass v0.0.0-20210920133722-c8aef6fb66ef
-## explicit
 github.com/howeyc/gopass
-# github.com/jlaffaye/ftp v0.0.0-20210307004419-5d4190119067
-## explicit
 # github.com/mattn/go-sqlite3 v2.0.3+incompatible
-## explicit
 github.com/mattn/go-sqlite3
-# github.com/robfig/cron v1.2.0
-## explicit
 # github.com/robfig/cron/v3 v3.0.1
-## explicit
 github.com/robfig/cron/v3
 # github.com/shirou/gopsutil v3.21.8+incompatible
-## explicit
 github.com/shirou/gopsutil/cpu
 github.com/shirou/gopsutil/disk
 github.com/shirou/gopsutil/host
@@ -60,7 +45,6 @@ github.com/shirou/gopsutil/mem
 github.com/shirou/gopsutil/net
 github.com/shirou/gopsutil/process
 # github.com/syndtr/goleveldb v1.0.0
-## explicit
 github.com/syndtr/goleveldb/leveldb
 github.com/syndtr/goleveldb/leveldb/cache
 github.com/syndtr/goleveldb/leveldb/comparer
@@ -74,10 +58,8 @@ github.com/syndtr/goleveldb/leveldb/storage
 github.com/syndtr/goleveldb/leveldb/table
 github.com/syndtr/goleveldb/leveldb/util
 # github.com/takama/daemon v1.0.0
-## explicit
 github.com/takama/daemon
 # github.com/tklauser/go-sysconf v0.3.9
-## explicit
 github.com/tklauser/go-sysconf
 # github.com/tklauser/numcpus v0.3.0
 github.com/tklauser/numcpus
