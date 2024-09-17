@@ -42,7 +42,7 @@ import (
 	"github.com/robfig/cron/v3"
 	"github.com/sjqzhang/mahonia"
 
-	"github.com/deckarep/golang-set"
+	mapset "github.com/deckarep/golang-set"
 	"github.com/go-xorm/xorm"
 	_ "github.com/mattn/go-sqlite3"
 
@@ -54,6 +54,13 @@ import (
 	filedriver "github.com/goftp/file-driver"
 	"github.com/goftp/server"
 	"github.com/syndtr/goleveldb/leveldb"
+
+	"github.com/shirou/gopsutil/v3/cpu"
+	"github.com/shirou/gopsutil/v3/disk"
+	"github.com/shirou/gopsutil/v3/host"
+	"github.com/shirou/gopsutil/v3/load"
+	"github.com/shirou/gopsutil/v3/mem"
+	psnet "github.com/shirou/gopsutil/v3/net"
 )
 
 const (
@@ -152,6 +159,122 @@ type Config struct {
 	IP            string
 }
 
+// 用于自动上执主机信息
+type CPUInfo struct {
+	ModelName string `json:"model_name"`
+	Cores     int    `json:"cores"`
+}
+
+type DiskInfo struct {
+	MountPoint   string  `json:"mount_point"`
+	TotalGB      float64 `json:"total_gb"`
+	FreeGB       float64 `json:"free_gb"`
+	UsagePercent float64 `json:"usage_percent"`
+}
+
+type NetworkInterface struct {
+	Name string `json:"name"`
+}
+
+type SystemLoad struct {
+	OneMin     float64 `json:"one_min"`
+	FiveMin    float64 `json:"five_min"`
+	FifteenMin float64 `json:"fifteen_min"`
+}
+
+type SystemInfo struct {
+	OS             string             `json:"os"`
+	Arch           string             `json:"arch"`
+	CPUCores       int                `json:"cpu_cores"`
+	Interfaces     []NetworkInterface `json:"network_interfaces"`
+	Hostname       string             `json:"hostname"`
+	MemoryTotalMB  float64            `json:"memory_total_mb"`
+	MemoryFreeMB   float64            `json:"memory_free_mb"`
+	MemoryUsedMB   float64            `json:"memory_used_mb"`
+	MemoryUsage    float64            `json:"memory_usage"`
+	CPU            []CPUInfo          `json:"cpu"`
+	NetworkTraffic struct {
+		BytesReceived uint64 `json:"bytes_received"`
+		BytesSent     uint64 `json:"bytes_sent"`
+	} `json:"network_traffic"`
+	BootTime string     `json:"boot_time"`
+	CPUUsage float64    `json:"cpu_usage"`
+	Disks    []DiskInfo `json:"disks"`
+	Load     SystemLoad `json:"load"`
+}
+
+func GetSystemInfo() SystemInfo {
+	var info SystemInfo
+
+	// 系统信息
+	info.OS = runtime.GOOS
+	info.Arch = runtime.GOARCH
+	info.CPUCores = runtime.GOMAXPROCS(0)
+
+	if loadInfo, err := load.Avg(); err == nil {
+		info.Load = SystemLoad{
+			OneMin:     loadInfo.Load1,
+			FiveMin:    loadInfo.Load5,
+			FifteenMin: loadInfo.Load15,
+		}
+	}
+
+	// 接口信息
+	if interfaces, err := psnet.Interfaces(); err == nil {
+		for _, iface := range interfaces {
+			info.Interfaces = append(info.Interfaces, NetworkInterface{Name: iface.Name})
+		}
+	}
+
+	// 主机名
+	info.Hostname, _ = os.Hostname()
+
+	// 内存信息
+	v, _ := mem.VirtualMemory()
+	info.MemoryTotalMB = float64(v.Total / 1024 / 1024)
+	info.MemoryFreeMB = float64(v.Available / 1024 / 1024)
+	info.MemoryUsedMB = float64(v.Used / 1024 / 1024)
+	info.MemoryUsage = v.UsedPercent
+
+	// CPU信息
+	if c, err := cpu.Info(); err == nil {
+		for _, subCpu := range c {
+			info.CPU = append(info.CPU, CPUInfo{ModelName: subCpu.ModelName, Cores: int(subCpu.Cores)})
+		}
+	}
+
+	// 网络流量
+	if nv, err := psnet.IOCounters(true); err == nil {
+		info.NetworkTraffic.BytesReceived = nv[0].BytesRecv
+		info.NetworkTraffic.BytesSent = nv[0].BytesSent
+	}
+
+	// 启动时间
+	if boottime, err := host.BootTime(); err == nil {
+		info.BootTime = time.Unix(int64(boottime), 0).Format("2006-01-02 15:04:05")
+	}
+	// CPU使用率
+	if cc, err := cpu.Percent(time.Second, false); err == nil {
+		if len(cc) > 0 {
+			info.CPUUsage = cc[0]
+		}
+	}
+
+	// 磁盘使用情况
+	if parts, err := disk.Partitions(false); err == nil {
+		for _, part := range parts {
+			usage, _ := disk.Usage(part.Mountpoint)
+			info.Disks = append(info.Disks, DiskInfo{
+				MountPoint:   part.Mountpoint,
+				TotalGB:      float64(usage.Total / 1024 / 1024 / 1024),
+				FreeGB:       float64(usage.Free / 1024 / 1024 / 1024),
+				UsagePercent: usage.UsedPercent,
+			})
+		}
+	}
+	return info
+
+}
 func Contain(obj interface{}, target interface{}) (bool, error) {
 	targetValue := reflect.ValueOf(target)
 	switch reflect.TypeOf(target).Kind() {
@@ -1642,22 +1765,55 @@ func (this *Cli) Heartbeat(uuid string) {
 			}
 		}
 		var data map[string]string
+		//将环境变量转化为map的形式存储到变量envs中
+		envs := make(map[string]string)
+
+		// 遍历环境变量
+		for _, env := range os.Environ() {
+			// 使用=分割环境变量，得到key和value
+			pair := strings.SplitN(env, "=", 2)
+			if len(pair) == 2 {
+				// 将key和value存入map中
+				envs[pair[0]] = pair[1]
+			}
+		}
+
+		// 打印环境变量map，以验证结果
+		for key, value := range envs {
+			fmt.Println(key, ":", value)
+		}
+		env, err := json.MarshalIndent(envs, "", " ")
+		envstr := "{}"
+		if err != nil {
+			envstr = string(env)
+		}
+		systemInfo := GetSystemInfo()
+		systemInfoStr := "{}"
+		if v, err := json.MarshalIndent(systemInfo, "", " "); err == nil {
+			systemInfoStr = string(v)
+		}
 		if this.conf.ShellStr == "" {
 			data = map[string]string{
-				"ips":      strings.Join(this.util.GetAllIps(), ","),
-				"uuid":     uuid,
-				"status":   "",
-				"platform": strings.ToLower(runtime.GOOS),
-				"hostname": this.util.GetHostName(),
+				"ips":         strings.Join(this.util.GetAllIps(), ","),
+				"uuid":        uuid,
+				"status":      "online",
+				"envs":        envstr,
+				"system_info": systemInfoStr,
+				"utime":       time.Now().Format("2006-01-02 15:04:05"),
+				"platform":    strings.ToLower(runtime.GOOS),
+				"hostname":    this.util.GetHostName(),
 			}
 		} else {
 			statusstr, _, _ := this.util.Exec(cmds, 60*5, nil)
 			data = map[string]string{
-				"ips":      strings.Join(this.util.GetAllIps(), ","),
-				"uuid":     uuid,
-				"status":   statusstr,
-				"platform": strings.ToLower(runtime.GOOS),
-				"hostname": this.util.GetHostName(),
+				"ips":         strings.Join(this.util.GetAllIps(), ","),
+				"uuid":        uuid,
+				"status":      statusstr,
+				"envs":        envstr,
+				"system_info": systemInfoStr,
+				"utime":       time.Now().Format("2006-01-02 15:04:05"),
+				"platform":    strings.ToLower(runtime.GOOS),
+				"hostname":    this.util.GetHostName(),
 			}
 		}
 
@@ -1804,6 +1960,13 @@ func (this *Cli) DealCommands(uuid string) {
 						"/c",
 						cliCommon.Cmd,
 					}
+				default:
+					cmds = []string{
+						"/bin/bash",
+						"-c",
+						cliCommon.Cmd,
+					}
+
 				}
 
 				if len(cmds) == 0 {
@@ -1953,7 +2116,10 @@ func (this *Cli) WatchEtcd(uuid string) {
 		url := GetNodeURL()
 		if url != "" {
 			url = url + "?recursive=true"
+
 			req := httplib.Get(url)
+			req.SetBasicAuth(this.conf.EtcdConf.User, this.conf.EtcdConf.Password)
+
 			var err error
 			if result == "" {
 				result, err = req.String()
@@ -2014,6 +2180,7 @@ func (this *Cli) WatchEtcd(uuid string) {
 				//				fmt.Println("watch url", url)
 			}
 			req := httplib.Get(url)
+			req.SetBasicAuth(this.conf.EtcdConf.User, this.conf.EtcdConf.Password)
 			req.SetTimeout(time.Second*5, time.Second*time.Duration(20+this.util.RandInt(1, 10)))
 			data, ok := req.String()
 			_ = data
