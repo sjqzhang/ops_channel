@@ -12,6 +12,9 @@ github.com/cihub/seelog/archive/tar
 github.com/cihub/seelog/archive/zip
 # github.com/deckarep/golang-set v1.8.0
 github.com/deckarep/golang-set
+# github.com/go-ole/go-ole v1.2.6
+github.com/go-ole/go-ole
+github.com/go-ole/go-ole/oleutil
 # github.com/go-xorm/xorm v0.7.9
 github.com/go-xorm/xorm
 # github.com/goftp/file-driver v0.0.0-20180502053751-5d604a0fc0c9
@@ -22,10 +25,26 @@ github.com/goftp/server
 github.com/golang/snappy
 # github.com/howeyc/gopass v0.0.0-20210920133722-c8aef6fb66ef
 github.com/howeyc/gopass
+# github.com/lufia/plan9stats v0.0.0-20211012122336-39d0f177ccd0
+github.com/lufia/plan9stats
 # github.com/mattn/go-sqlite3 v1.14.23
 github.com/mattn/go-sqlite3
+# github.com/power-devops/perfstat v0.0.0-20210106213030-5aafc221ea8c
+github.com/power-devops/perfstat
 # github.com/robfig/cron/v3 v3.0.1
 github.com/robfig/cron/v3
+# github.com/shirou/gopsutil/v3 v3.24.5
+github.com/shirou/gopsutil/v3/common
+github.com/shirou/gopsutil/v3/cpu
+github.com/shirou/gopsutil/v3/disk
+github.com/shirou/gopsutil/v3/host
+github.com/shirou/gopsutil/v3/internal/common
+github.com/shirou/gopsutil/v3/load
+github.com/shirou/gopsutil/v3/mem
+github.com/shirou/gopsutil/v3/net
+github.com/shirou/gopsutil/v3/process
+# github.com/shoenig/go-m1cpu v0.1.6
+github.com/shoenig/go-m1cpu
 # github.com/sjqzhang/mahonia v0.0.0-20240917025504-6daa9f9c316f
 github.com/sjqzhang/mahonia
 # github.com/syndtr/goleveldb v1.0.0
@@ -43,6 +62,12 @@ github.com/syndtr/goleveldb/leveldb/table
 github.com/syndtr/goleveldb/leveldb/util
 # github.com/takama/daemon v1.0.0
 github.com/takama/daemon
+# github.com/tklauser/go-sysconf v0.3.12
+github.com/tklauser/go-sysconf
+# github.com/tklauser/numcpus v0.6.1
+github.com/tklauser/numcpus
+# github.com/yusufpapurcu/wmi v1.2.4
+github.com/yusufpapurcu/wmi
 # golang.org/x/crypto v0.27.0
 golang.org/x/crypto/ssh/terminal
 # golang.org/x/net v0.29.0
