@@ -1779,12 +1779,12 @@ func (this *Cli) Heartbeat(uuid string) {
 		}
 
 		// 打印环境变量map，以验证结果
-		for key, value := range envs {
-			fmt.Println(key, ":", value)
-		}
+		//for key, value := range envs {
+		//	fmt.Println(key, ":", value)
+		//}
 		env, err := json.MarshalIndent(envs, "", " ")
 		envstr := "{}"
-		if err != nil {
+		if err == nil {
 			envstr = string(env)
 		}
 		systemInfo := GetSystemInfo()
@@ -3694,6 +3694,7 @@ func (this *Cli) Run() {
 				fp.WriteString(fmt.Sprintf("%s", strings.Join(pps, "\n")))
 				fp.Close()
 			} else {
+				log.Error(err.Error())
 				fmt.Println(err.Error())
 			}
 			if getMem() > 500 {
