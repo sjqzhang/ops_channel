@@ -2,7 +2,7 @@
 github.com/PuerkitoBio/goquery
 # github.com/andybalholm/cascadia v1.3.2
 github.com/andybalholm/cascadia
-# github.com/astaxie/beego v1.12.1
+# github.com/astaxie/beego v1.12.2
 github.com/astaxie/beego/httplib
 # github.com/cihub/seelog v0.0.0-20170130134532-f561c5e57575
 github.com/cihub/seelog
@@ -22,7 +22,7 @@ github.com/goftp/server
 github.com/golang/snappy
 # github.com/howeyc/gopass v0.0.0-20210920133722-c8aef6fb66ef
 github.com/howeyc/gopass
-# github.com/mattn/go-sqlite3 v1.14.23
+# github.com/mattn/go-sqlite3 v2.0.3+incompatible
 github.com/mattn/go-sqlite3
 # github.com/robfig/cron/v3 v3.0.1
 github.com/robfig/cron/v3
