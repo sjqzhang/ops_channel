@@ -12,8 +12,8 @@ import (
 	"crypto/tls"
 	"database/sql"
 	"encoding/base64"
-	"encoding/json"
 	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -38,18 +38,15 @@ import (
 
 	log "github.com/cihub/seelog"
 
-	"code.google.com/p/mahonia"
 	"github.com/astaxie/beego/httplib"
-	"github.com/robfig/cron"
-	//	"github.com/donnie4w/go-logger/logger"
+	"github.com/robfig/cron/v3"
+	"github.com/sjqzhang/mahonia"
 
-		_ "github.com/mattn/go-sqlite3"
-	"github.com/go-xorm/xorm"
 	"github.com/deckarep/golang-set"
+	"github.com/go-xorm/xorm"
+	_ "github.com/mattn/go-sqlite3"
 
 	"github.com/howeyc/gopass"
-	//	"github.com/kardianos/service"
-	//	"github.com/sjqzhang/daemon"
 
 	"github.com/takama/daemon"
 
@@ -82,7 +79,7 @@ var CLI_SERVER = "http://127.0.01:9160"
 
 var PID_FILE = "/var/lib/cli/cli.pid"
 
-var CLI_DB_FILE="/var/lib/cli/cli.db"
+var CLI_DB_FILE = "/var/lib/cli/cli.db"
 
 var CLI_BENCHMARK = false
 
@@ -90,24 +87,23 @@ var HOSTNAME = ""
 var util = &Common{}
 var cli = NewCli()
 
-var cronTab=newWithSeconds()
+var cronTab = newWithSeconds()
 var engine *xorm.Engine
 
-
 type TCron struct {
-	Fid         int       `xorm:"not null pk autoincr INT(11)"`
-	Fmd5       string    `xorm:"not null default '' VARCHAR(64)"`
-	Fip       string    `xorm:"not null default '' VARCHAR(36)"`
-	Fcron      string    `xorm:"not null default ''  VARCHAR(128)"`
-	Fjob       string    `xorm:"not null default ''  VARCHAR(256)`
-	Ftimeout	int `xorm:"not null default -1 INT(11)"`
-	Fdesc	string `xorm:"not null default '' VARCHAR(1024)""`
-	Fstatus	int `xorm:"not null default '-1' INT(11)""`
-	Fenable	int `xorm:"not null default '1' INT(11)""`
-	Furl string  `xorm:"not null default '' VARCHAR(128)"`
-	Fpid int  `xorm:"not null default '0' int(11)"`
-	FlastUpdate string  `xorm:"not null default '' VARCHAR(128)"`
-	Fresult string  `xorm:"not null default '' TEXT"`
+	Fid         int    `xorm:"not null pk autoincr INT(11)"`
+	Fmd5        string `xorm:"not null default '' VARCHAR(64)"`
+	Fip         string `xorm:"not null default '' VARCHAR(36)"`
+	Fcron       string `xorm:"not null default ''  VARCHAR(128)"`
+	Fjob        string `xorm:"not null default ''  VARCHAR(256)`
+	Ftimeout    int    `xorm:"not null default -1 INT(11)"`
+	Fdesc       string `xorm:"not null default '' VARCHAR(1024)""`
+	Fstatus     int    `xorm:"not null default '-1' INT(11)""`
+	Fenable     int    `xorm:"not null default '1' INT(11)""`
+	Furl        string `xorm:"not null default '' VARCHAR(128)"`
+	Fpid        int    `xorm:"not null default '0' int(11)"`
+	FlastUpdate string `xorm:"not null default '' VARCHAR(128)"`
+	Fresult     string `xorm:"not null default '' TEXT"`
 }
 
 type CliCommon struct {
@@ -179,7 +175,6 @@ func newWithSeconds() *cron.Cron {
 		cron.Hour | cron.Dom | cron.Month | cron.DowOptional | cron.Descriptor)
 	return cron.New(cron.WithParser(secondParser), cron.WithChain())
 }
-
 
 func NewConfig() *Config {
 
@@ -290,45 +285,44 @@ func (this *Common) SqliteExec(filename string, s string) (int64, error) {
 
 }
 
-func (this *Common) Color(m string,c string)  string {
-	color:= func(m string,c string) string {
-		colorMap:=make(map[string]string)
-		if c=="" {
-			c="green"
+func (this *Common) Color(m string, c string) string {
+	color := func(m string, c string) string {
+		colorMap := make(map[string]string)
+		if c == "" {
+			c = "green"
 		}
-		black:=fmt.Sprintf("\033[30m%s\033[0m",m)
-		red:=fmt.Sprintf("\033[31m%s\033[0m",m)
-		green:=fmt.Sprintf("\033[32m%s\033[0m",m)
-		yello:=fmt.Sprintf("\033[33m%s\033[0m",m)
-		blue:=fmt.Sprintf("\033[34m%s\033[0m" ,m)
-		purple:=fmt.Sprintf("\033[35m%s\033[0m" ,m)
-		white:=fmt.Sprintf( "\033[37m%s\033[0m" ,m)
-		glint:=fmt.Sprintf(  "\033[5;31m%s\033[0m" ,m)
-		colorMap["black"]=black
-		colorMap["red"]=red
-		colorMap["green"]=green
-		colorMap["yello"]=yello
-		colorMap["yellow"]=yello
-		colorMap["blue"]=blue
-		colorMap["purple"]=purple
-		colorMap["white"]=white
-		colorMap["glint"]=glint
-		if v,ok:=colorMap[c];ok {
+		black := fmt.Sprintf("\033[30m%s\033[0m", m)
+		red := fmt.Sprintf("\033[31m%s\033[0m", m)
+		green := fmt.Sprintf("\033[32m%s\033[0m", m)
+		yello := fmt.Sprintf("\033[33m%s\033[0m", m)
+		blue := fmt.Sprintf("\033[34m%s\033[0m", m)
+		purple := fmt.Sprintf("\033[35m%s\033[0m", m)
+		white := fmt.Sprintf("\033[37m%s\033[0m", m)
+		glint := fmt.Sprintf("\033[5;31m%s\033[0m", m)
+		colorMap["black"] = black
+		colorMap["red"] = red
+		colorMap["green"] = green
+		colorMap["yello"] = yello
+		colorMap["yellow"] = yello
+		colorMap["blue"] = blue
+		colorMap["purple"] = purple
+		colorMap["white"] = white
+		colorMap["glint"] = glint
+		if v, ok := colorMap[c]; ok {
 			return v
 		} else {
 			return colorMap["green"]
 		}
 	}
-	return color(m,c)
+	return color(m, c)
 }
 
-
 func (this *Common) Jq(data interface{}, key string) interface{} {
-	if v,ok:= data.(string);ok {
-		data=this.JsonDecode(v)
+	if v, ok := data.(string); ok {
+		data = this.JsonDecode(v)
 	}
-	if v,ok:= data.([]byte);ok {
-		data=this.JsonDecode(string(v))
+	if v, ok := data.([]byte); ok {
+		data = this.JsonDecode(string(v))
 	}
 	var obj interface{}
 	var ks []string
@@ -509,15 +503,15 @@ func (this *Common) SqliteInsert(filename string, table string, records []interf
 			"UPDATE",
 			"VIEW",
 			"GROUP"}
-		_=keyword
+		_ = keyword
 		for _, record := range records {
 			switch record.(type) {
 			case map[string]interface{}:
 				for key, _ := range record.(map[string]interface{}) {
-					if strings.HasPrefix(key,"`") {
+					if strings.HasPrefix(key, "`") {
 						continue
 					}
-					key2 :=fmt.Sprintf("`%s`", key)
+					key2 := fmt.Sprintf("`%s`", key)
 					record.(map[string]interface{})[key2] = record.(map[string]interface{})[key]
 					delete(record.(map[string]interface{}), key)
 					hashKeys[key2] = struct{}{}
@@ -530,7 +524,6 @@ func (this *Common) SqliteInsert(filename string, table string, records []interf
 		for key, _ := range hashKeys {
 			keys = append(keys, key)
 		}
-
 
 		//		db.Exec("DROP TABLE data")
 		query := fmt.Sprintf("CREATE TABLE %s ("+strings.Join(keys, ",")+")", table)
@@ -616,10 +609,8 @@ func (this *Common) Contains(obj interface{}, arrayobj interface{}) bool {
 	return false
 }
 
-
-
 func (this *Common) Replace(s string, o string, n string) string {
-	reg:= regexp.MustCompile(o);
+	reg := regexp.MustCompile(o)
 	s = reg.ReplaceAllString(s, n)
 	return s
 }
@@ -807,9 +798,9 @@ func (this *Common) ParseArgs(args string, sep string) map[string]string {
 		}
 
 	}
-	for k,v:=range ret {
-		if k=="file" && this.IsExist(v) {
-			ret[k]=this.ReadFile(v)
+	for k, v := range ret {
+		if k == "file" && this.IsExist(v) {
+			ret[k] = this.ReadFile(v)
 		}
 	}
 	return ret
@@ -832,17 +823,14 @@ func (this *Common) GetModule(conf *Config) string {
 
 }
 
-
-
-
 func (this *Common) MD5File(fn string) string {
-	file,err:=os.Open(fn)
-	if err!=nil {
+	file, err := os.Open(fn)
+	if err != nil {
 		return ""
 	}
 	defer file.Close()
 	md5 := md5.New()
-	io.Copy(md5,file)
+	io.Copy(md5, file)
 	return hex.EncodeToString(md5.Sum(nil))
 }
 
@@ -885,8 +873,8 @@ func (this *Common) WriteFile(path string, content string) bool {
 	var f *os.File
 	var err error
 	if this.IsExist(path) {
-		err=os.Remove(path)
-		if err!=nil {
+		err = os.Remove(path)
+		if err != nil {
 			return false
 		}
 		f, err = os.Create(path)
@@ -1031,7 +1019,7 @@ func (this *Common) Exec(cmd []string, timeout int, kw map[string]string) (strin
 	if kw != nil {
 		if taskId, ok = kw["task_id"]; ok {
 			kwBytes, _ := json.Marshal(kw)
-			if err:=json.Unmarshal(kwBytes, &cliCommon);err!=nil {
+			if err := json.Unmarshal(kwBytes, &cliCommon); err != nil {
 				log.Error(err)
 			}
 		}
@@ -1039,9 +1027,8 @@ func (this *Common) Exec(cmd []string, timeout int, kw map[string]string) (strin
 	if taskId == "" {
 		taskId = time.Now().Format("20060102150405") + fmt.Sprintf("%d", time.Now().Unix())
 	}
-	fpath = "/tmp/" + taskId+ fmt.Sprintf( "_%d",random.New(random.NewSource(time.Now().UnixNano())).Intn(60))
+	fpath = "/tmp/" + taskId + fmt.Sprintf("_%d", random.New(random.NewSource(time.Now().UnixNano())).Intn(60))
 	fp, err = os.OpenFile(fpath, os.O_CREATE|os.O_RDWR, 0666)
-
 
 	if err != nil {
 		log.Error(err)
@@ -1049,8 +1036,8 @@ func (this *Common) Exec(cmd []string, timeout int, kw map[string]string) (strin
 	}
 	defer fp.Close()
 	duration := time.Duration(timeout) * time.Second
-	if timeout==-1 {
-		duration=time.Duration(60*60*24*365) * time.Second
+	if timeout == -1 {
+		duration = time.Duration(60*60*24*365) * time.Second
 	}
 	ctx, _ := context.WithTimeout(context.Background(), duration)
 
@@ -1143,7 +1130,7 @@ func (this *Common) Exec(cmd []string, timeout int, kw map[string]string) (strin
 		}
 	}
 
-	_=CallBack2
+	_ = CallBack2
 
 	if cliCommon.TaskId != "" {
 		go CallBack2(&flag, &cliCommon)
@@ -1159,21 +1146,21 @@ func (this *Common) Exec(cmd []string, timeout int, kw map[string]string) (strin
 			os.Remove(fpath)
 		}
 	}
-	_=RemoveFile
+	_ = RemoveFile
 	defer RemoveFile()
 	err = command.Run()
-	if err!=nil {
-		if len(kw)>0 {
+	if err != nil {
+		if len(kw) > 0 {
 			log.Info(kw)
-			log.Error("error:"+err.Error(),"\ttask_id:"+fpath,"\tcmd:"+cliCommon.Cmd,"\tcmd:"+ strings.Join(cmd," "))
+			log.Error("error:"+err.Error(), "\ttask_id:"+fpath, "\tcmd:"+cliCommon.Cmd, "\tcmd:"+strings.Join(cmd, " "))
 		} else {
-			log.Info("task_id:"+fpath,"\tcmd:"+cliCommon.Cmd,"\tcmd:"+ strings.Join(cmd," "))
+			log.Info("task_id:"+fpath, "\tcmd:"+cliCommon.Cmd, "\tcmd:"+strings.Join(cmd, " "))
 		}
 		log.Flush()
 		fp.Sync()
 		//fp.Seek(0, 2)
 		data, err = ioutil.ReadFile(fpath)
-		if err!=nil {
+		if err != nil {
 			log.Error(err)
 			log.Flush()
 			return string(data), err.Error(), -1
@@ -1257,9 +1244,9 @@ func (this *Common) SetCliValByKey(key string, value string) {
 		if strings.Split(info.Host, ":")[0] != "127.0.0.1" {
 			dict["server"] = CLI_SERVER
 		}
-		filename:="/var/lib/cli/.cli"
+		filename := "/var/lib/cli/.cli"
 		os.MkdirAll("/var/lib/cli", 0777)
-		this.WriteFile(filename,fmt.Sprintf("server=%s",CLI_SERVER))
+		this.WriteFile(filename, fmt.Sprintf("server=%s", CLI_SERVER))
 		os.Chmod(filename, 0777)
 	}
 	filename := ""
@@ -1301,8 +1288,8 @@ func (this *Common) GetCliValByKey(key string) string {
 	dict := map[string]string{}
 	if dir, ok := this.Home(); ok == nil {
 		filename := dir + "/" + ".cli"
-		if key=="server" {
-			filename="/var/lib/cli/.cli"
+		if key == "server" {
+			filename = "/var/lib/cli/.cli"
 		}
 		content := this.ReadFile(filename)
 		if content != "" {
@@ -1341,22 +1328,21 @@ func (this *Common) Request(url string, data map[string]string) string {
 	}
 
 	//begin
-	if strings.Contains(url,"feedback_result") {   // just for feedback_result,this is bad code
-		data2:=make(map[string]interface{})
-		for k,v:=range data {
-			data2[k]=v
+	if strings.Contains(url, "feedback_result") { // just for feedback_result,this is bad code
+		data2 := make(map[string]interface{})
+		for k, v := range data {
+			data2[k] = v
 		}
-		if m,ok:=data["kw"];ok {
+		if m, ok := data["kw"]; ok {
 			var kw map[string]interface{}
-			if err:=json.Unmarshal([]byte(m),&kw);err==nil {
-				data2["kw"]=kw
+			if err := json.Unmarshal([]byte(m), &kw); err == nil {
+				data2["kw"] = kw
 			}
 		}
 		if pdata, err := json.Marshal(data2); err == nil {
 			body = string(pdata)
 		}
-	}//end
-
+	} //end
 
 	req := httplib.Post(url)
 
@@ -1756,7 +1742,7 @@ func (this *Cli) deleteCmd(key string) {
 	result, err := request.SetTimeout(5*time.Second, 8*time.Second).String()
 	if err != nil {
 		fmt.Println("delcmd error", err)
-		log.Error(err,result)
+		log.Error(err, result)
 	}
 	//log.Debug("delcmd", result)
 }
@@ -1875,14 +1861,12 @@ func (this *Cli) DealCommands(uuid string) {
 					}
 
 					feedbackUrl := this.conf.EnterURL + "/" + this.conf.DefaultModule + "/feedback_result"
-					log.Info("task_id:"+cliCommon.TaskId+ "\tcmd:" + cliCommon.Cmd)
+					log.Info("task_id:" + cliCommon.TaskId + "\tcmd:" + cliCommon.Cmd)
 
 					if feedback == "1" {
-						res:=this._Request(feedbackUrl, jsonData)
-						log.Info("feedback_result:",res, "\tdata:",this.util.JsonEncode(jsonData))
+						res := this._Request(feedbackUrl, jsonData)
+						log.Info("feedback_result:", res, "\tdata:", this.util.JsonEncode(jsonData))
 					}
-
-
 
 					if log_to_file == "1" {
 
@@ -1900,9 +1884,9 @@ func (this *Cli) DealCommands(uuid string) {
 						taskid, _ := data["task_id"]
 						log.Info(fmt.Sprintf("task_id:%s feedback to url:%s", taskid, url))
 						if s, err := request.String(); err != nil {
-							log.Error(err,s)
+							log.Error(err, s)
 						} else {
-							log.Info("callback_result:"+s)
+							log.Info("callback_result:" + s)
 						}
 					}
 					if cliCommon.UrlSuccess != "" && status == 0 {
@@ -1965,23 +1949,23 @@ func (this *Cli) WatchEtcd(uuid string) {
 	}
 
 	DealWithData := func(result string) {
-		time.Sleep(time.Millisecond*time.Duration(this.util.RandInt(100,300)))
+		time.Sleep(time.Millisecond * time.Duration(this.util.RandInt(100, 300)))
 		url := GetNodeURL()
 		if url != "" {
 			url = url + "?recursive=true"
 			req := httplib.Get(url)
 			var err error
-			if result=="" {
+			if result == "" {
 				result, err = req.String()
 			}
 			//			log.Debug("WatchEtcd,URL:", url, "DealWithData result:", result)
 			if err == nil {
 				var watchData WatchData
-				if err= json.Unmarshal([]byte(result), &watchData);err!=nil {
+				if err = json.Unmarshal([]byte(result), &watchData); err != nil {
 					log.Error(err)
 					return
 				}
-				if watchData.Action=="delete"{
+				if watchData.Action == "delete" {
 					return
 				}
 				for _, k := range watchData.Node.Nodes {
@@ -2030,9 +2014,9 @@ func (this *Cli) WatchEtcd(uuid string) {
 				//				fmt.Println("watch url", url)
 			}
 			req := httplib.Get(url)
-			req.SetTimeout(time.Second*5,time.Second* time.Duration(20+this.util.RandInt(1,10)))
+			req.SetTimeout(time.Second*5, time.Second*time.Duration(20+this.util.RandInt(1, 10)))
 			data, ok := req.String()
-			_=data
+			_ = data
 			if ok == nil {
 				go DealWithData("")
 			} else {
@@ -2051,8 +2035,6 @@ func (this *Cli) killPython() {
 	this.util.ExecCmd([]string{"ps aux|grep python|grep 'cli daemon'|awk '{print $2}'|xargs -n 1 kill"}, 10)
 }
 
-
-
 func (this *Cli) getPids() []string {
 	//cmd := `source /etc/profile ; ps aux|grep -w 'daemon -s daemon'|grep -v grep|awk '{print $2}'`
 	//cmds := []string{
@@ -2064,32 +2046,32 @@ func (this *Cli) getPids() []string {
 	//log.Error(cmds)
 	//return strings.Trim(pid, "\n ")
 	pid := this.util.ReadFile(PID_FILE)
-	return strings.Split(strings.TrimSpace(pid),"\n")
+	return strings.Split(strings.TrimSpace(pid), "\n")
 }
 func (this *Cli) isRunning() bool {
 	pids := this.getPids()
-	count:=0
-	for _,pid:=range pids {
+	count := 0
+	for _, pid := range pids {
 		if pid == "" {
 			continue
 		}
 		if this.util.IsWindows() {
 			pids := this.util.ExecCmd([]string{"tasklist", "/FI", fmt.Sprintf("PID eq %s", pid)}, 10)
 			if strings.Index(pids, pid) > 0 {
-				count=count+1
+				count = count + 1
 			}
 		} else {
 			if this.util.IsExist(fmt.Sprintf("/proc/%s", pid)) {
-				count=count+1
+				count = count + 1
 			}
 		}
 	}
-	if count>1 {
-		log.Error("muti process is running",pids)
+	if count > 1 {
+		log.Error("muti process is running", pids)
 		log.Flush()
 		os.Exit(0)
 	}
-	if count==1{
+	if count == 1 {
 		return true
 	}
 	return false
@@ -2097,11 +2079,11 @@ func (this *Cli) isRunning() bool {
 
 func (this *Cli) stop() {
 	pids := this.getPids()
-	for _,pid:=range pids {
-		if pid=="" {
+	for _, pid := range pids {
+		if pid == "" {
 			continue
 		}
-		if this.util.IsWindows()  {
+		if this.util.IsWindows() {
 			this.util.ExecCmd([]string{"taskkill.exe", "/F", "/PID", pid}, 10)
 		} else {
 			//this.util.ExecCmd(strings.Split(fmt.Sprintf("sudo kill -9 %s", pid)," "), 10)
@@ -2148,7 +2130,7 @@ func (this *Cli) Daemon(module string, action string) {
 			cmd.Wait()
 		}()
 
-		time.Sleep(time.Millisecond*300)
+		time.Sleep(time.Millisecond * 300)
 		return
 	}
 
@@ -2261,22 +2243,21 @@ func (this *Cli) Shell(module string, action string) {
 	argv := this.util.GetArgsMap()
 	file := ""
 	dir := ""
-	update:="0"
-	debug:="0"
-	timeout:=-1
+	update := "0"
+	debug := "0"
+	timeout := -1
 	ok := true
 	if v, ok := argv["u"]; ok {
-		update=v
+		update = v
 	}
 
 	if v, ok := argv["x"]; ok {
-		debug=v
+		debug = v
 	}
 
 	if v, ok := argv["t"]; ok {
-		timeout,_= strconv.Atoi(v)
+		timeout, _ = strconv.Atoi(v)
 	}
-
 
 	if file, ok = argv["f"]; !ok {
 		fmt.Println("-f(filename) is required")
@@ -2291,7 +2272,7 @@ func (this *Cli) Shell(module string, action string) {
 	if !this.util.IsExist(path) {
 		log.Debug(os.MkdirAll(path, 0777))
 	}
-	os.Chmod(path,0777)
+	os.Chmod(path, 0777)
 
 	includeRegStr := `#include\s+-f\s+(?P<filename>[a-zA-Z.0-9_-]+)?\s+-d\s+(?P<dir>[a-zA-Z.0-9_-]+)?|#include\s+-d\s+(?P<dir2>[a-zA-Z.0-9_-]+)?\s+-f\s+(?P<filename2>[a-zA-Z.0-9_-]+)?`
 	DownloadShell := func(dir, file string) (string, error) {
@@ -2329,8 +2310,7 @@ func (this *Cli) Shell(module string, action string) {
 	fpath = strings.Replace(fpath, "///", "/", -1)
 	fpath = strings.Replace(fpath, "//", "/", -1)
 
-
-    if update=="1" || !this.util.IsExist(fpath) {
+	if update == "1" || !this.util.IsExist(fpath) {
 		if src, err = DownloadShell(dir, file); err != nil {
 			log.Error(err)
 			return
@@ -2347,7 +2327,7 @@ func (this *Cli) Shell(module string, action string) {
 
 		this.util.WriteFile(fpath, src)
 	} else {
-		src=this.util.ReadFile(fpath)
+		src = this.util.ReadFile(fpath)
 	}
 
 	lines := strings.Split(src, "\n")
@@ -2380,7 +2360,7 @@ func (this *Cli) Shell(module string, action string) {
 			"/bin/bash",
 			fpath,
 		}
-		if debug=="1" {
+		if debug == "1" {
 			cmds = []string{
 				"/bin/bash",
 				"-x",
@@ -2401,16 +2381,16 @@ func (this *Cli) Shell(module string, action string) {
 	if args, ok := argvMap["a"]; ok {
 		cmds = append(cmds, strings.Split(args, " ")...)
 	} else {
-        var args []string
-        var tflag bool
-        tflag=false
-		for i,v:=range os.Args {
-			if v=="-t" {
-				tflag=true
+		var args []string
+		var tflag bool
+		tflag = false
+		for i, v := range os.Args {
+			if v == "-t" {
+				tflag = true
 				continue
 			}
 			if tflag {
-				tflag=false
+				tflag = false
 				continue
 			}
 			if v != "-x" && v != "-u" {
@@ -2419,9 +2399,9 @@ func (this *Cli) Shell(module string, action string) {
 		}
 		//fmt.Println("update:",update,"debug:",debug)
 		//fmt.Println("args:",args)
-		os.Args=args
+		os.Args = args
 		cmds = append(cmds, os.Args[6:]...)
-		fmt.Println("cmds",cmds)
+		fmt.Println("cmds", cmds)
 	}
 	result, _, _ = this.util.Exec(cmds, timeout, nil)
 	fmt.Println(result)
@@ -2518,24 +2498,23 @@ func (this *Cli) Upper(module string, action string) {
 	fmt.Println(strings.ToUpper(in))
 }
 
-
 func (this *Cli) Wlog(module string, action string) {
-	m:=""
-	l:="info"
+	m := ""
+	l := "info"
 	argv := this.util.GetArgsMap()
 	if v, ok := argv["m"]; ok {
-		m=v
+		m = v
 	}
-	if m=="" {
+	if m == "" {
 		fmt.Println("-m(message) is require, -l(level) info,warn,error")
 		return
 	}
 	if v, ok := argv["l"]; ok {
-		l=v
+		l = v
 	}
-    if (l=="warn") {
+	if l == "warn" {
 		log.Warn(m)
-	} else if(l=="error") {
+	} else if l == "error" {
 		log.Error(m)
 	} else {
 		log.Info(m)
@@ -2545,42 +2524,42 @@ func (this *Cli) Wlog(module string, action string) {
 }
 
 func (this *Cli) Cmd(module string, action string) {
-	p:=5
-	sleep:=0
-	output:="json2"
-	ip:=""
-	isOutput:=false
+	p := 5
+	sleep := 0
+	output := "json2"
+	ip := ""
+	isOutput := false
 	var ips []string
 	argv := this.util.GetArgsMap()
 	if v, ok := argv["p"]; ok {
-		p,_=strconv.Atoi(v)
+		p, _ = strconv.Atoi(v)
 	}
 	if v, ok := argv["sleep"]; ok {
-		sleep,_=strconv.Atoi(v)
+		sleep, _ = strconv.Atoi(v)
 	}
 	if v, ok := argv["o"]; ok {
-		output=v
-		isOutput=true
+		output = v
+		isOutput = true
 	}
 	if v, ok := argv["i"]; ok {
-		ip=v
-		if _,err:= os.Stat(ip);err==nil {
-			bip,_:=ioutil.ReadFile(ip)
-			exp,_:=regexp.Compile(`[\r\n]+`)
-			lines:=exp.Split(string(bip),-1)
-			for _,line:=range lines {
-				line=strings.TrimSpace(line)
-				if strings.HasPrefix(line,"#") {
+		ip = v
+		if _, err := os.Stat(ip); err == nil {
+			bip, _ := ioutil.ReadFile(ip)
+			exp, _ := regexp.Compile(`[\r\n]+`)
+			lines := exp.Split(string(bip), -1)
+			for _, line := range lines {
+				line = strings.TrimSpace(line)
+				if strings.HasPrefix(line, "#") {
 					continue
 				}
-				ips=append(ips,line)
+				ips = append(ips, line)
 			}
-			ip=string(bip)
+			ip = string(bip)
 		} else {
-			ips=strings.Split(ip,",")
+			ips = strings.Split(ip, ",")
 		}
 	} else {
-		message:= `
+		message := `
 {
   "message":"(error) -i(ip) is require"
 }
@@ -2588,40 +2567,40 @@ func (this *Cli) Cmd(module string, action string) {
 		fmt.Println(message)
 		return
 	}
-	argv["o"]=output
-	argv["sleep"]=fmt.Sprintf("%d",sleep)
-  	_=p
+	argv["o"] = output
+	argv["sleep"] = fmt.Sprintf("%d", sleep)
+	_ = p
 
-  	sendCmd:= func(argv map[string]string) {
+	sendCmd := func(argv map[string]string) {
 		res := this._Request(this.conf.EnterURL+"/"+this.conf.DefaultModule+"/api", argv)
 		if isOutput {
-			s:=this.util.JsonEncodePretty(res)
-			if s!="" {
+			s := this.util.JsonEncodePretty(res)
+			if s != "" {
 				fmt.Println(s)
 			} else {
 				fmt.Println(res)
 			}
 			return
 		}
-		rows:=this.util.Jq(res,"results")
-		message:=this.util.Jq(res,"message")
-		if message!=nil {
+		rows := this.util.Jq(res, "results")
+		message := this.util.Jq(res, "message")
+		if message != nil {
 			fmt.Println(res)
 			return
 		}
 		var results []string
 		switch rows.(type) {
 		case []interface{}:
-			for _,row:=range rows.([]interface{}) {
+			for _, row := range rows.([]interface{}) {
 				switch row.(type) {
 				case map[string]interface{}:
-					result:=row.(map[string]interface{})["result"].(string)
-					return_code:= fmt.Sprintf("%v", row.(map[string]interface{})["return_code"])
-					_ip:=row.(map[string]interface{})["i"]
-					if strings.HasPrefix(result,"(error)") {
+					result := row.(map[string]interface{})["result"].(string)
+					return_code := fmt.Sprintf("%v", row.(map[string]interface{})["return_code"])
+					_ip := row.(map[string]interface{})["i"]
+					if strings.HasPrefix(result, "(error)") {
 						result = fmt.Sprintf("%s\n%s|failed\n%s\n\n", strings.Repeat("-", 80), _ip, result)
 						results = append(results, this.util.Color(result, "yello"))
-					} else if return_code=="0" {
+					} else if return_code == "0" {
 						result = fmt.Sprintf("%s\n%s|success\n%s\n\n", strings.Repeat("-", 80), _ip, result)
 						results = append(results, this.util.Color(result, "green"))
 					} else {
@@ -2632,40 +2611,38 @@ func (this *Cli) Cmd(module string, action string) {
 				}
 			}
 		}
-		fmt.Println(strings.Join(results,"\n"))
+		fmt.Println(strings.Join(results, "\n"))
 	}
 	var bips []string
-	for _,_ip:=range ips {
-		bips=append(bips,_ip)
-		if len(bips)>=p {
+	for _, _ip := range ips {
+		bips = append(bips, _ip)
+		if len(bips) >= p {
 			argv["i"] = strings.Join(bips, ",")
 			sendCmd(argv)
-			if sleep>0 {
-				time.Sleep(time.Second*time.Duration(sleep))
+			if sleep > 0 {
+				time.Sleep(time.Second * time.Duration(sleep))
 			}
 			bips = []string{}
 		}
 	}
-	if len(bips)>0 {
+	if len(bips) > 0 {
 		argv["i"] = strings.Join(bips, ",")
 		sendCmd(argv)
 	}
 }
 
 func (this *Cli) Color(module string, action string) {
-	m:=""
-	c:="green"
+	m := ""
+	c := "green"
 	argv := this.util.GetArgsMap()
 	if v, ok := argv["m"]; ok {
-		m=v
+		m = v
 	}
 	if v, ok := argv["c"]; ok {
-		c=v
+		c = v
 	}
-	fmt.Println(this.util.Color(m,c))
+	fmt.Println(this.util.Color(m, c))
 }
-
-
 
 func (this *Cli) Randstr(module string, action string) {
 	l := 10
@@ -2689,7 +2666,7 @@ func (this *Cli) Randstr(module string, action string) {
 }
 
 func (this *Cli) Uuid(module string, action string) {
-	id:=this.util.GetUUID()
+	id := this.util.GetUUID()
 	fmt.Println(id)
 }
 
@@ -2718,11 +2695,10 @@ func (this *Cli) Randint(module string, action string) {
 
 }
 
-
 func (this *Cli) Md5(module string, action string) {
 
 	s := ""
-	fn:=""
+	fn := ""
 	argv := this.util.GetArgsMap()
 	if v, ok := argv["s"]; ok {
 		s = v
@@ -2732,7 +2708,7 @@ func (this *Cli) Md5(module string, action string) {
 	if v, ok := argv["f"]; ok {
 		fn = v
 	}
-	if fn!=""{
+	if fn != "" {
 		fmt.Println(this.util.MD5File(fn))
 		return
 	}
@@ -2751,7 +2727,7 @@ func (this *Cli) Cut(module string, action string) {
 		s = v
 	}
 	if s == "" {
-		s=this.StdioStr(module,action)
+		s = this.StdioStr(module, action)
 
 	}
 	if v, ok := argv["p"]; ok {
@@ -2789,7 +2765,7 @@ func (this *Cli) Split(module string, action string) {
 	}
 
 	if s == "" {
-		s=this.StdioStr(module,action)
+		s = this.StdioStr(module, action)
 
 	}
 
@@ -2801,9 +2777,6 @@ func (this *Cli) Split(module string, action string) {
 	}
 
 }
-
-
-
 
 func (this *Cli) StdioStr(module string, action string) string {
 	var lines []string
@@ -2834,12 +2807,12 @@ func (this *Cli) Replace(module string, action string) {
 	}
 
 	if s == "" {
-		s=this.StdioStr(module,action)
+		s = this.StdioStr(module, action)
 		//_, s = this.StdinJson(module, action)
 
 	}
-	reg := regexp.MustCompile(o);
-	fmt.Println(reg.ReplaceAllString(s,n))
+	reg := regexp.MustCompile(o)
+	fmt.Println(reg.ReplaceAllString(s, n))
 }
 
 func (this *Cli) Match(module string, action string) {
@@ -3128,12 +3101,13 @@ func (this *Cli) Pq(module string, action string) {
 	dom.Find(s).Each(func(i int, selection *goquery.Selection) {
 
 		if a == "link" {
-			href, ok = selection.Attr("href")
-			title = selection.Text()
-			item := make(map[string]string)
-			item["href"] = strings.TrimSpace(href)
-			item["title"] = strings.TrimSpace(title)
-			result = append(result, item)
+			if href, ok = selection.Attr("href"); ok {
+				title = selection.Text()
+				item := make(map[string]string)
+				item["href"] = strings.TrimSpace(href)
+				item["title"] = strings.TrimSpace(title)
+				result = append(result, item)
+			}
 		} else if a == "table" {
 			var rows []string
 			selection.Find("table tr").Each(func(i int, selection *goquery.Selection) {
@@ -3163,11 +3137,8 @@ func (this *Cli) Pq(module string, action string) {
 
 }
 
-
-
-
 func (this *Cli) Json_val(module string, action string) {
-	this.Jq(module,action)
+	this.Jq(module, action)
 }
 
 func (this *Cli) Jq(module string, action string) {
@@ -3264,7 +3235,7 @@ func (this *Cli) Jf(module string, action string) {
 	w := "1=1"
 	s := "select %s from data where 1=1 and %s %s"
 
-	limit:=""
+	limit := ""
 	argv := this.util.GetArgsMap()
 	if v, ok := argv["c"]; ok {
 		c = v
@@ -3275,11 +3246,11 @@ func (this *Cli) Jf(module string, action string) {
 	}
 
 	if v, ok := argv["limit"]; ok {
-		limit = " limit "+ v
+		limit = " limit " + v
 	}
 
 	db, err := sql.Open("sqlite3", ":memory:")
-	if err!=nil {
+	if err != nil {
 		log.Error(err)
 		log.Flush()
 		return
@@ -3320,7 +3291,7 @@ func (this *Cli) Jf(module string, action string) {
 			"VIEW",
 			"GROUP"}
 
-		_=keyword
+		_ = keyword
 
 		//for _, record := range records {
 		//	switch record.(type) {
@@ -3341,17 +3312,16 @@ func (this *Cli) Jf(module string, action string) {
 			switch record.(type) {
 			case map[string]interface{}:
 				for key, _ := range record.(map[string]interface{}) {
-					if strings.HasPrefix(key,"`") {
+					if strings.HasPrefix(key, "`") {
 						continue
 					}
-					key2 :=fmt.Sprintf("`%s`", key)
+					key2 := fmt.Sprintf("`%s`", key)
 					record.(map[string]interface{})[key2] = record.(map[string]interface{})[key]
 					delete(record.(map[string]interface{}), key)
 					hashKeys[key2] = struct{}{}
 				}
 			}
 		}
-
 
 		keys := []string{}
 
@@ -3387,7 +3357,7 @@ func (this *Cli) Jf(module string, action string) {
 
 			statement, err := db.Prepare(query)
 			if err != nil {
-				log.Error(err, "can't prepare query: %s", query,recordKeys,recordArgs,recordValues)
+				log.Error(err, "can't prepare query: %s", query, recordKeys, recordArgs, recordValues)
 				log.Flush()
 				continue
 
@@ -3428,12 +3398,12 @@ func (this *Cli) Jf(module string, action string) {
 		log.Error(err.Error())
 	}
 
-	s = fmt.Sprintf(s, c, w,limit)
+	s = fmt.Sprintf(s, c, w, limit)
 
 	rows, err := db.Query(s)
 
 	if err != nil {
-		log.Error(err,s)
+		log.Error(err, s)
 		log.Flush()
 		fmt.Println(err)
 		return
@@ -3531,51 +3501,49 @@ func (this *Cli) Run() {
 		}
 	}
 
-
-	getMem:= func() uint64  {
+	getMem := func() uint64 {
 		var ms runtime.MemStats
 		runtime.ReadMemStats(&ms)
-		return ms.HeapAlloc/1024/1024
+		return ms.HeapAlloc / 1024 / 1024
 	}
 
 	go func() {
-		this.util.ExecCmd([]string{"cli shell -d system -f install_cli_sdk.py"},10)
+		this.util.ExecCmd([]string{"cli shell -d system -f install_cli_sdk.py"}, 10)
 		this.stop()
 		for {
-			mpids:=make(map[string]string)
-			pids:=this.getPids()
-			for _,pid:=range pids {
-				mpids[pid]=pid
+			mpids := make(map[string]string)
+			pids := this.getPids()
+			for _, pid := range pids {
+				mpids[pid] = pid
 			}
-			mpids[fmt.Sprintf("%d", os.Getpid())]=fmt.Sprintf("%d", os.Getpid())
+			mpids[fmt.Sprintf("%d", os.Getpid())] = fmt.Sprintf("%d", os.Getpid())
 			var pps []string
-			for k,_:=range mpids {
-				if strings.TrimSpace(k)!="" {
+			for k, _ := range mpids {
+				if strings.TrimSpace(k) != "" {
 					pps = append(pps, k)
 				}
 			}
 			if fp, err := os.OpenFile(PID_FILE, os.O_CREATE|os.O_RDWR, 0644); err == nil {
-					fp.WriteString(fmt.Sprintf("%s", strings.Join(pps,"\n")))
-					fp.Close()
+				fp.WriteString(fmt.Sprintf("%s", strings.Join(pps, "\n")))
+				fp.Close()
 			} else {
 				fmt.Println(err.Error())
 			}
-			if getMem()>500 {
+			if getMem() > 500 {
 				log.Warn("cli process suicide...")
 				os.Exit(1)
 			}
 			this.isRunning()
-			if this.util.RandInt(0,30)<3 {
+			if this.util.RandInt(0, 30) < 3 {
 				this.killPython()
 			}
-			time.Sleep(time.Second*60)
+			time.Sleep(time.Second * 60)
 
 		}
 	}()
 
 	select {}
 }
-
 
 func (this *Cli) Httpserver(module string, action string) {
 
@@ -3750,7 +3718,7 @@ func (this *Daemon) Manage(cli *Cli) (string, error) {
 	return usage, nil
 }
 
-func initHttpLib()  {
+func initHttpLib() {
 
 	defaultTransport := &http.Transport{
 		DisableKeepAlives:   true,
@@ -3770,7 +3738,7 @@ func initHttpLib()  {
 
 }
 
-func initCron()  {
+func initCron() {
 	defer func() {
 		if re := recover(); re != nil {
 			buffer := debug.Stack()
@@ -3778,24 +3746,24 @@ func initCron()  {
 			log.Flush()
 		}
 	}()
-    var err error
-	engine,err=xorm.NewEngine("sqlite3",CLI_DB_FILE)
-	if err!=nil {
+	var err error
+	engine, err = xorm.NewEngine("sqlite3", CLI_DB_FILE)
+	if err != nil {
 		log.Error(err.Error())
 		return
 	}
 	//engine.ShowSQL(true)
-	if err = engine.Sync2(new(TCron));err != nil {
+	if err = engine.Sync2(new(TCron)); err != nil {
 		log.Error(err.Error())
 	}
 	engine.Exec("CREATE UNIQUE INDEX `UQE_t_cron_cron` ON `t_cron` (`Fcron`,`Fjob`);")
-	cache:=make(map[int]TCron)
-	ip:=cli.util.GetLocalIP()
+	cache := make(map[int]TCron)
+	ip := cli.util.GetLocalIP()
 
-	refreshFromServer:= func() {
+	refreshFromServer := func() {
 		data := make(map[string]string)
 		data["i"] = ip
-		data["a"]="list"
+		data["a"] = "list"
 		data["uuid"] = cli.util.GetProductUUID()
 		result := cli.util.Request(cli.conf.EnterURL+"/cli/cron", data)
 		var crons []TCron
@@ -3804,56 +3772,56 @@ func initCron()  {
 			return
 		}
 
-		mds:=mapset.NewSet()
-		for _,c:=range crons {
+		mds := mapset.NewSet()
+		for _, c := range crons {
 			mds.Add(c.Fmd5)
 		}
 		var _crons []TCron
 
-		_mds:=mapset.NewSet()
-		err:=engine.Where("1=1").Find(&_crons)
-		if err!=nil {
+		_mds := mapset.NewSet()
+		err := engine.Where("1=1").Find(&_crons)
+		if err != nil {
 			log.Error(err)
 			return
 		}
-		for _,c:=range _crons {
+		for _, c := range _crons {
 			_mds.Add(c.Fmd5)
 		}
 
-		if !mds.Equal(_mds){
-			log.Info("reset cron ",mds,_mds)
-			entries:=cronTab.Entries()
-			for _,entry:=range entries {
+		if !mds.Equal(_mds) {
+			log.Info("reset cron ", mds, _mds)
+			entries := cronTab.Entries()
+			for _, entry := range entries {
 				cronTab.Remove(entry.ID)
 			}
 			engine.Where("1=1").Delete(&TCron{})
-			for _,c:=range crons {
-				if _,err:=engine.Insert(&c);err!=nil {
+			for _, c := range crons {
+				if _, err := engine.Insert(&c); err != nil {
 					fmt.Println(err)
 					log.Error(err)
 				}
 			}
-			cache=make(map[int]TCron)
+			cache = make(map[int]TCron)
 		} else {
-			for _,c:=range crons {
-				engine.Cols("Fenable","Furl","Fip","Fdesc","Ftimeout","Fcron","Fjob").Where("Fmd5=?",c.Fmd5).Update(&c)
+			for _, c := range crons {
+				engine.Cols("Fenable", "Furl", "Fip", "Fdesc", "Ftimeout", "Fcron", "Fjob").Where("Fmd5=?", c.Fmd5).Update(&c)
 			}
 		}
 
 	}
 
-	refreshJob:= func() {
+	refreshJob := func() {
 		jobs := make([]TCron, 0)
 		err = engine.Where("1=1").Find(&jobs)
-		if err!=nil {
+		if err != nil {
 			log.Error(err.Error())
 			return
 		}
-		for k,job:=range cache {//delete from db
-			exist:=false
-			for _,_job:=range jobs {
-				if _job.Fid==k {
-					exist=true
+		for k, job := range cache { //delete from db
+			exist := false
+			for _, _job := range jobs {
+				if _job.Fid == k {
+					exist = true
 					break
 				}
 			}
@@ -3861,22 +3829,22 @@ func initCron()  {
 				cronTab.Remove(cron.EntryID(job.Fpid))
 			}
 		}
-		for _,job:=range jobs { // add job not exist
-			if job.Fenable!=1 {
+		for _, job := range jobs { // add job not exist
+			if job.Fenable != 1 {
 				cronTab.Remove(cron.EntryID(job.Fpid))
-				delete(cache,job.Fid)
+				delete(cache, job.Fid)
 				continue
 			}
 			//md5str:=cli.util.MD5( fmt.Sprintf("%s,%s,%s",ip, job.Fcron,job.Fjob))
-			if _job,ok:=cache[job.Fid];ok {
-				if job.Fenable==_job.Fenable {
+			if _job, ok := cache[job.Fid]; ok {
+				if job.Fenable == _job.Fenable {
 					continue
 				} else {
 					cronTab.Remove(cron.EntryID(_job.Fpid))
 				}
 			}
-			j:= func(job TCron) cron.FuncJob {
-				jj:= func() {
+			j := func(job TCron) cron.FuncJob {
+				jj := func() {
 					defer func() {
 						if re := recover(); re != nil {
 							buffer := debug.Stack()
@@ -3898,24 +3866,24 @@ func initCron()  {
 					} else {
 						job.Fresult = result
 					}
-					if _, err := engine.Where("Fid=?", job.Fid).Cols("flast_update","Fresult").Update(job); err != nil {
+					if _, err := engine.Where("Fid=?", job.Fid).Cols("flast_update", "Fresult").Update(job); err != nil {
 						log.Error(err.Error())
 					}
 				}
 				return cron.FuncJob(jj)
 			}
-			_j:=j(job)
-			if jobId,err:=cronTab.AddFunc(job.Fcron,_j);err!=nil {
-				log.Error(err.Error(),job)
-				job.Fpid=0
+			_j := j(job)
+			if jobId, err := cronTab.AddFunc(job.Fcron, _j); err != nil {
+				log.Error(err.Error(), job)
+				job.Fpid = 0
 			} else {
-				job.Fpid=int(jobId)
-				cache[job.Fid]=job
-				log.Info(jobId,job)
+				job.Fpid = int(jobId)
+				cache[job.Fid] = job
+				log.Info(jobId, job)
 			}
 			//job.Fmd5=md5str
-			job.FlastUpdate=time.Now().Format("2006-01-02 15:04:05")
-			if _,err:=engine.Cols("Fmd5","flast_update","Fpid").Where("Fid=?",job.Fid).Update(job);err!=nil {
+			job.FlastUpdate = time.Now().Format("2006-01-02 15:04:05")
+			if _, err := engine.Cols("Fmd5", "flast_update", "Fpid").Where("Fid=?", job.Fid).Update(job); err != nil {
 				log.Error(err.Error())
 			}
 
@@ -3924,21 +3892,21 @@ func initCron()  {
 
 	cronTab.Start()
 	go func() {
-		for{
-			time.Sleep(time.Second*time.Duration(cli.util.RandInt(5,10)))
+		for {
+			time.Sleep(time.Second * time.Duration(cli.util.RandInt(5, 10)))
 			refreshJob()
-			if len(cronTab.Entries())!=len(cache) {
+			if len(cronTab.Entries()) != len(cache) {
 				log.Warn("jobs:", len(cronTab.Entries()), len(cache))
 			}
-			time.Sleep(time.Second* time.Duration(cli.util.RandInt(30,60)))
+			time.Sleep(time.Second * time.Duration(cli.util.RandInt(30, 60)))
 		}
 	}()
 
 	go func() {
-		for{
+		for {
 			refreshFromServer()
 			//time.Sleep(time.Second*10)
-			time.Sleep(time.Second* time.Duration(cli.util.RandInt(30,60)))
+			time.Sleep(time.Second * time.Duration(cli.util.RandInt(30, 60)))
 		}
 	}()
 }
@@ -3951,8 +3919,8 @@ func init() {
 	//		logger.SetLevel(log.Debug)
 	//	}
 
-	os.MkdirAll("/var/log/",07777)
-	os.MkdirAll("/var/lib/cli",07777)
+	os.MkdirAll("/var/log/", 07777)
+	os.MkdirAll("/var/lib/cli", 07777)
 
 	initHttpLib()
 
@@ -4021,8 +3989,6 @@ func main() {
 		cli.Help(module, action)
 		return
 	}
-
-
 
 	for i := 0; i < obj.NumMethod(); i++ {
 		if obj.MethodByName(strings.Title(action)).IsValid() {
