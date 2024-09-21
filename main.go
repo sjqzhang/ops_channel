@@ -82,7 +82,7 @@ const (
 
 var DEBUG = false
 var BENCHMARK = false
-var CLI_SERVER = "http://127.0.01:9160"
+var CLI_SERVER = "https://127.0.0.1:9160"
 
 var PID_FILE = "/var/lib/cli/cli.pid"
 
@@ -3901,6 +3901,7 @@ func initHttpLib() {
 		Gzip:             true,
 		DumpBody:         true,
 		Transport:        defaultTransport,
+		TLSClientConfig:  &tls.Config{InsecureSkipVerify: true},
 	}
 	httplib.SetDefaultSetting(settins)
 
